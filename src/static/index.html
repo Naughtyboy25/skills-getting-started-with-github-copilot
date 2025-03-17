@@ -62,7 +62,10 @@
                 <h4>${activityName}</h4>
                 <p>${activityDetails.description}</p>
                 <p><strong>Schedule:</strong> ${activityDetails.schedule}</p>
-                <p><strong>Participants:</strong> ${activityDetails.participants.join(", ") || "None"}</p>
+                <p><strong>Participants:</strong></p>
+                <ul class="participants-list">
+                  ${activityDetails.participants.map(participant => `<li>${participant}</li>`).join("")}
+                </ul>
               `;
               activitiesList.appendChild(activityCard);
 
@@ -72,6 +75,30 @@
               activitySelect.appendChild(option);
             }
           });
+
+        const signupForm = document.getElementById("signup-form");
+        signupForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const email = document.getElementById("email").value;
+          const activity = document.getElementById("activity").value;
+
+          fetch(`/activities/${activity}/signup?email=${email}`, {
+            method: "POST"
+          })
+          .then(response => response.json())
+          .then(data => {
+            const messageDiv = document.getElementById("message");
+            messageDiv.className = "message info";
+            messageDiv.textContent = data.message;
+            messageDiv.classList.remove("hidden");
+          })
+          .catch(error => {
+            const messageDiv = document.getElementById("message");
+            messageDiv.className = "message error";
+            messageDiv.textContent = "An error occurred. Please try again.";
+            messageDiv.classList.remove("hidden");
+          });
+        });
       });
     </script>
   </body>
